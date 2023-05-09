@@ -2,7 +2,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Scanner;
 
 //Authors:   Patrick Tibbals, Iam McLean
@@ -133,23 +132,27 @@ class Main {
     }
 
     private static void decryption() {
-        Scanner s = new Scanner(System.in);
-       
-        System.out.println("Please enter the password: ");
-        String pw = s.nextLine();
+        if(endcodedFile==null){
+            System.out.println("You need to encrypt a file first!");
+            return;
+        }
+        try (Scanner s = new Scanner(System.in)) {
+            System.out.println("Please enter the password: ");
+            String pw = s.nextLine();
 
 
-        String keka = k.KMACJOB(endcodedFile[0] + pw, "", "S", 1024 / 4);
-        String ke = keka.substring(0, keka.length() / 2);
-        String ka = keka.substring(keka.length() / 2);
+            String keka = k.KMACJOB(endcodedFile[0] + pw, "", "S", 1024 / 4);
+            String ke = keka.substring(0, keka.length() / 2);
+            String ka = keka.substring(keka.length() / 2);
 
-        String m = utils.XORhex(k.KMACJOB(ke, "", "SKE", endcodedFile[1].length()), endcodedFile[1]);
-        String tPrime = k.KMACJOB(ka, m, "SKA", 512 / 2);
+            String m = utils.XORhex(k.KMACJOB(ke, "", "SKE", endcodedFile[1].length()), endcodedFile[1]);
+            String tPrime = k.KMACJOB(ka, m, "SKA", 512 / 2);
 
-        if (endcodedFile[2].equals(tPrime)) {
-            System.out.println("Accepted Input");
-        } else {
-            System.out.println("Incorrect t != t'");
+            if (endcodedFile[2].equals(tPrime)) {
+                System.out.println("Accepted Input");
+            } else {
+                System.out.println("Incorrect t != t'");
+            }
         }
     }
 
